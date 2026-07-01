@@ -96,6 +96,8 @@ def query(text: str) -> str:
     
 async def get_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name:str = update.message.text
+    name = name.replace('/stats','').strip()
+    name = conv_names.get(name,name)
     try:
         id = getId(name)
     except:
@@ -110,7 +112,6 @@ async def get_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             losses = x['losses']
             winrate = round(wins/(wins+losses) * 100,2)
             await update.message.reply_text(f'{name} is in {tier} {rank} with {winrate}% winrate')
-    await update.message.reply_text(f'bruh {name} got no history')
 
 #CLASH LOGIC
 clash_types = {33: 'Summoner\'s Rift', 34: 'Howling Abyss'}
