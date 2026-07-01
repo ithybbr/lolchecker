@@ -7,6 +7,7 @@ class Watcher:
     def get_puuid(self, summoner_name, tag_line):
         url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag_line}?api_key={self.api_key}"
         response = requests.get(url)
+        print(f"get_puuid response: {response.status_code}, {response.text}")  # Debugging line
         if response.status_code == 200:
             data = response.json()
             return data['puuid']
