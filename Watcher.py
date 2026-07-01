@@ -37,6 +37,7 @@ class Watcher:
 test_names = os.getenv("NAMES").split(",")
 print(test_names)
 w = Watcher(os.getenv("API_KEY"))
+print(os.getenv("API_KEY"))
 print(w.get_puuid(test_names[0].split("#")[0], test_names[0].split("#")[1]))
 print(w.get_stats('europe', w.get_puuid(test_names[0].split("#")[0], test_names[0].split("#")[1])))
 print(w.get_spectator('europe', w.get_puuid(test_names[0].split("#")[0], test_names[0].split("#")[1])))
