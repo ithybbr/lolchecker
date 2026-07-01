@@ -14,7 +14,8 @@ class Cache:
                     del self.cache[key]
                     del self.timestamps[key]
             return self.cache.get(key)
-    
+        def values(self):
+            return self.cache.values()
         def set(self, key, value, ttl=None):
             if ttl is not None:
                 self.ttl = ttl
