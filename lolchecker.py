@@ -36,6 +36,8 @@ async def query_q(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(response)
         return
     response: str = query(conv_names.get(text,text))
+    if response == None:
+        response = f'{text} is not playing rn'
     await update.message.reply_text(response)
 # JUST PINGS IN THE GROUP CHAT
 async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -92,7 +94,7 @@ def query(text: str) -> str:
         champName = leaguenames(championId)
         return f'{text} is playing {champName}. The game has started at {today} & current in-game time is roughly {minutes}:{seconds :02d}'
     else:
-        return f'{text} is not currently playing'
+        return None
     
 async def get_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name:str = update.message.text
