@@ -1,3 +1,5 @@
+import os
+
 import requests
 class Watcher:
     def __init__(self, api_key):
@@ -31,3 +33,11 @@ class Watcher:
             return response.json()
         else:
             return None
+test_names = os.getenv("NAMES").split(",")
+print(test_names)
+w = Watcher(os.getenv("API_KEY"))
+print(w.get_puuid(test_names[0].split("#")[0], test_names[0].split("#")[1]))
+print(w.get_stats('europe', w.get_puuid(test_names[0].split("#")[0], test_names[0].split("#")[1])))
+print(w.get_spectator('europe', w.get_puuid(test_names[0].split("#")[0], test_names[0].split("#")[1])))
+print(w.get_clash('europe'))
+
