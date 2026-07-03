@@ -1,6 +1,7 @@
 import os
-
+from dotenv import load_dotenv
 import requests
+
 class Watcher:
     def __init__(self, api_key):
         self.api_key = api_key
@@ -34,13 +35,15 @@ class Watcher:
             return response.json()
         else:
             return None
-test_names = os.getenv("NAMES").split(",")
-print(test_names)
-w = Watcher(os.getenv("API_KEY"))
-print(os.getenv("API_KEY"))
-p = w.get_puuid(test_names[0].split("#")[0], test_names[0].split("#")[1])
-print(p)
-print(w.get_stats('europe', p))
-print(w.get_spectator('europe', p))
-print(w.get_clash('europe'))
+if(__name__ == '__main__'):
+    load_dotenv()
+    test_names = os.getenv("NAMES").split(",")
+    print(test_names)
+    w = Watcher(os.getenv("API_KEY"))
+    print(os.getenv("API_KEY"))
+    p = w.get_puuid(test_names[0].split("#")[0], test_names[0].split("#")[1])
+    print(p)
+    print(w.get_stats('europe', p))
+    print(w.get_spectator('europe', p))
+    print(w.get_clash('europe'))
 
