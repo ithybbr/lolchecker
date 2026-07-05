@@ -80,7 +80,8 @@ async def delete_poll_message(context: ContextTypes.DEFAULT_TYPE):
     context.bot_data.get('active_polls', {}).pop(data['poll_id'], None)
     await context.bot.delete_message(chat_id=data['chat_id'], message_id=data['message_id'])
     await context.bot.delete_messages(chat_id=data['chat_id'], message_ids=list(context.bot_data.get('active_pings', [])))
-    
+async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await delete_poll_message(context)    
 async def query_q(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = update.message.text
     text = text.replace('/q','').strip()
@@ -122,7 +123,7 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler('ping',ping))
     app.add_handler(CommandHandler('clashwhen',clash))
     app.add_handler(CommandHandler('poll',poll))
-    app.add_handler(CommandHandler('stop',delete_poll_message))
+    app.add_handler(CommandHandler('stop',stop))
     app.add_handler(CommandHandler('stats',stats))
     app.add_handler(CommandHandler('chat',chat))
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
