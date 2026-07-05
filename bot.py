@@ -122,6 +122,7 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler('ping',ping))
     app.add_handler(CommandHandler('clashwhen',clash))
     app.add_handler(CommandHandler('poll',poll))
+    app.add_handler(CommandHandler('stop',delete_poll_message))
     app.add_handler(CommandHandler('stats',stats))
     app.add_handler(CommandHandler('chat',chat))
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
