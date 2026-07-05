@@ -8,7 +8,8 @@ client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
 def ask_gemini(prompt: str) -> str:
     interaction = client.interactions.create(
         model="gemini-3.5-flash",
-        input=prompt
+        input=prompt,
+        system_instruction="Respond in less than 4000 characters."
     )
     return interaction.output_text
 
