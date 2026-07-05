@@ -81,7 +81,10 @@ async def delete_poll_message(context: ContextTypes.DEFAULT_TYPE):
     await context.bot.delete_message(chat_id=data['chat_id'], message_id=data['message_id'])
     await context.bot.delete_messages(chat_id=data['chat_id'], message_ids=list(context.bot_data.get('active_pings', [])))
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await delete_poll_message(context)    
+    chat_id = update.message.chat_id
+    poll_id = context.bot_data.get('active_polls', {})[0].get('message_id')
+    context.bot_data.pop('active_polls', None)
+    await context.bot.delete_message(chat_id=chat_id, message_id=poll_id)
 async def query_q(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = update.message.text
     text = text.replace('/q','').strip()
