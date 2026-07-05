@@ -6,6 +6,7 @@ import os
 import json
 from flask import Flask
 import lolchecker
+import gemini
 app = Flask(__name__)
 
 load_dotenv()
@@ -22,8 +23,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     '/q <name> - to check if someone is playing\n'
     '/ping <text> - to ping the group with a custom message\n'
     '/clashwhen - to check when the next clash is\n'
-    '/ninjas <text> - to create a poll for the group chat\n'
+    '/poll <text> - to create a poll for the group chat\n'
     '/stats <name> - to check the stats of a player\n'
+    '/chat <text> - to prompt gemini\n'
     f'{json.dumps(conv_names, indent=4, separators=("", " --- "))}\n')
 async def delete_pin_notification(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.delete()
@@ -33,10 +35,15 @@ async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = text.replace('/ping','').strip()
     await update.message.reply_text(f'{os.getenv("PING_TEXT")} {text}', parse_mode='Markdown')
 
+async def chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text: str = update.message.text
+    text = text.replace('/chat','').strip()
+    response: str = gemini.ask_gemini(text)
+    await update.message.reply_text(response)
 #creates poll for the group chat
-async def ninjas_assemble(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text: str = update.message.text.replace("/ninjas", "").strip()
-    message = await update.message.reply_poll(question=f'Are you ready for {text}?',
+async def poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text: str = update.message.text.replace("/poll", "").strip()
+    message = await update.message.reply_poll(question=f'{text}?',
         options=['Locked In', 'Geeked out'], is_anonymous=False, allows_multiple_answers=False)
 
     base_ping = os.getenv("PING_TEXT")
@@ -65,16 +72,15 @@ async def reminder(context: ContextTypes.DEFAULT_TYPE):
     poll_id = context.job.data
     poll_info = context.bot_data.get('active_polls', {}).get(poll_id)
     if poll_info and poll_info.get('ping_text', '').strip():
-        await context.bot.send_message(chat_id=poll_info['chat_id'],text=poll_info['ping_text'],parse_mode='Markdown')
+        message = await context.bot.send_message(chat_id=poll_info['chat_id'],text=poll_info['ping_text'],parse_mode='Markdown', reply_to_message_id=poll_info['message_id'])
+        context.bot_data.setdefault('active_pings', []).append(message.message_id)
 
 async def delete_poll_message(context: ContextTypes.DEFAULT_TYPE):
     data = context.job.data
     context.bot_data.get('active_polls', {}).pop(data['poll_id'], None)
     await context.bot.delete_message(chat_id=data['chat_id'], message_id=data['message_id'])
+    await context.bot.delete_messages(chat_id=data['chat_id'], message_ids=list(context.bot_data.get('active_pings', [])))
     
-async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print(f'Update {update} caused error {context.error}')
-
 async def query_q(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = update.message.text
     text = text.replace('/q','').strip()
@@ -103,6 +109,9 @@ async def clash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response: str = lolchecker.next_clash()
     await update.message.reply_text(response)
 
+async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print(f'Update {update} caused error {context.error}')
+
 if __name__ == '__main__':
     print('Starting bot...')
     app = Application.builder().token(Token).build()
@@ -112,8 +121,9 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler('q',query_q))
     app.add_handler(CommandHandler('ping',ping))
     app.add_handler(CommandHandler('clashwhen',clash))
-    app.add_handler(CommandHandler('ninjas',ninjas_assemble))
+    app.add_handler(CommandHandler('poll',poll))
     app.add_handler(CommandHandler('stats',stats))
+    app.add_handler(CommandHandler('chat',chat))
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
     app.add_handler(MessageHandler(filters.StatusUpdate.PINNED_MESSAGE, delete_pin_notification))
     app.add_handler(PollAnswerHandler(receive_poll_answer))
