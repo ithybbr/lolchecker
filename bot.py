@@ -54,12 +54,10 @@ async def poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
         'question': text,
         'ping_text': base_ping,   # per-poll copy
     }
-
     await message.pin(disable_notification=False)
-
+    context.job_queue.run_once(delete_poll_message, when=60 * 60 * 5, data={'chat_id': message.chat_id, 'message_id': message.message_id, 'poll_id': message.poll.id, 'parent_id': update.message.message_id}, name=f'delete_poll_{message.message_id}')
     context.job_queue.run_repeating(reminder, interval=60 * 60, first=60 * 60, last=60 * 60 * 4, data=message.poll.id, chat_id=message.chat_id, name=str(message.poll.id))
 
-    context.job_queue.run_once(delete_poll_message, when=60 * 60 * 5, data={'chat_id': message.chat_id, 'message_id': message.message_id, 'poll_id': message.poll.id})
 
 async def receive_poll_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     answer = update.poll_answer
@@ -78,13 +76,19 @@ async def reminder(context: ContextTypes.DEFAULT_TYPE):
 async def delete_poll_message(context: ContextTypes.DEFAULT_TYPE):
     data = context.job.data
     context.bot_data.get('active_polls', {}).pop(data['poll_id'], None)
+    await context.bot.delete_message(chat_id=data['chat_id'], message_id=data['parent_id'])
     await context.bot.delete_message(chat_id=data['chat_id'], message_id=data['message_id'])
-    await context.bot.delete_messages(chat_id=data['chat_id'], message_ids=list(context.bot_data.get('active_pings', [])))
+    l = list(context.bot_data.get('active_pings', []))
+    if l:
+        await context.bot.delete_messages(chat_id=data['chat_id'], message_ids=l)
+    context.job_queue.get_jobs_by_name(str(data['poll_id']))[0].schedule_removal()
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.message.chat_id
-    poll_id = context.bot_data.get('active_polls', {})[0].get('message_id')
-    context.bot_data.pop('active_polls', None)
-    await context.bot.delete_message(chat_id=chat_id, message_id=poll_id)
+    message_id: str = update.message.reply_to_message.id
+    chat_id: str = update.message.chat_id
+    application: Application = context.application
+    await context.bot.delete_message(chat_id=chat_id, message_id=update.message.message_id)
+    await context.job_queue.get_jobs_by_name(f'delete_poll_{message_id}')[0].run(application)
+    context.job_queue.get_jobs_by_name(f'delete_poll_{message_id}')[0].schedule_removal()
 async def query_q(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = update.message.text
     text = text.replace('/q','').strip()
