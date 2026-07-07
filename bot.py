@@ -28,7 +28,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     f'{json.dumps(conv_names, indent=4, separators=("", " --- "))}\n')
 async def get_exchange_rate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = update.message.text
-    text = text.replace('/exchange','').strip()
+    text = text.replace('/rate','').strip()
     first, second = text.split(' ')
     exchange_rate = currency.get_exchange_rate(first, second)
     await update.message.reply_text(f'1 {first} = {exchange_rate} {second}')
