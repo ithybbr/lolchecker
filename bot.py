@@ -4,11 +4,9 @@ from telegram.ext import Application, CommandHandler, JobQueue, MessageHandler, 
 from dotenv import load_dotenv
 import os
 import json
-from flask import Flask
 import currency
 import lolchecker
 import gemini
-app = Flask(__name__)
 
 load_dotenv()
 
