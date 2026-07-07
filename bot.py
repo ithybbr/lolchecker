@@ -23,13 +23,22 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     '/ping <text> - to ping the group with a custom message\n'
     '/clashwhen - to check when the next clash is\n'
     '/poll <text> - to create a poll for the group chat\n'
+    '/stop - stops the replied poll'
     '/stats <name> - to check the stats of a player\n'
     '/chat <text> - to prompt gemini\n'
+    '/rate <cur1> <cur2>- to get currency exchange rate'
     f'{json.dumps(conv_names, indent=4, separators=("", " --- "))}\n')
 async def get_exchange_rate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = update.message.text
-    text = text.replace('/rate','').strip()
-    first, second = text.split(' ')
+    text = text.replace('/rate','').strip().upper()
+    first = "USD"
+    second = "KZT"
+    if(text != ''):
+        first = text.split(' ')[0]
+    try:
+        second = text.split(' ')[1]
+    except:
+        pass
     exchange_rate = currency.get_exchange_rate(first, second)
     await update.message.reply_text(f'1 {first} = {exchange_rate} {second}')
 async def delete_pin_notification(update: Update, context: ContextTypes.DEFAULT_TYPE):
