@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 import json
 from flask import Flask
+import currency
 import lolchecker
 import gemini
 app = Flask(__name__)
@@ -27,6 +28,12 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     '/stats <name> - to check the stats of a player\n'
     '/chat <text> - to prompt gemini\n'
     f'{json.dumps(conv_names, indent=4, separators=("", " --- "))}\n')
+async def get_exchange_rate(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text: str = update.message.text
+    text = text.replace('/exchange','').strip()
+    first, second = text.split(' ')
+    exchange_rate = currency.get_exchange_rate(first, second)
+    await update.message.reply_text(f'1 {first} = {exchange_rate} {second}')
 async def delete_pin_notification(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.delete()
 # JUST PINGS IN THE GROUP CHAT
@@ -133,6 +140,7 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler('stop',stop))
     app.add_handler(CommandHandler('stats',stats))
     app.add_handler(CommandHandler('chat',chat))
+    app.add_handler(CommandHandler('rate', get_exchange_rate))
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
     app.add_handler(MessageHandler(filters.StatusUpdate.PINNED_MESSAGE, delete_pin_notification))
     app.add_handler(PollAnswerHandler(receive_poll_answer))
