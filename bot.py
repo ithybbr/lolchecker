@@ -133,6 +133,7 @@ async def clash(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(f'Update {update} caused error {context.error}')
+    await update.message.reply_text(context.error)
 
 if __name__ == '__main__':
     print('Starting bot...')
