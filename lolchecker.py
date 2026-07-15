@@ -2,7 +2,7 @@ from leaguenames import leaguenames
 from dotenv import load_dotenv
 from Watcher import Watcher
 from cache import Cache
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 import os
 
 load_dotenv()
@@ -10,7 +10,7 @@ load_dotenv()
 api_key = os.getenv("API_KEY")
 watcher = Watcher(api_key)
 my_region = 'ru'
-
+tz_utc5 = timezone(timedelta(hours=5))
 id_cache = Cache()
 def getId(name: str) -> str:
     try:
@@ -54,7 +54,7 @@ def query(text: str) -> str:
         minutes = round(length / 60)
         seconds = length % 60
         start_time = match['gameStartTime'] / 1000
-        today = datetime.fromtimestamp(start_time).strftime('%H:%M')
+        today = datetime.fromtimestamp(start_time, tz_utc5).strftime('%H:%M')
         for i in range(0,10):
             if(match['participants'][i]['puuid'] == id):
                 championId = match['participants'][i]['championId']
@@ -102,7 +102,7 @@ def next_clash() -> str:
             start_time = clash[0]['schedule'][0]['startTime'] / 1000
             theme_id = clash[0]['themeId']
             theme = clash_types.get(theme_id, 'Unknown')
-            deadline = datetime.fromtimestamp(start_time) - timedelta(hours=1)
+            deadline = datetime.fromtimestamp(start_time, tz_utc5) - timedelta(hours=1)
             deadline = deadline.strftime('%d.%m %H:%M')
             return f'Next clash is {theme} on {deadline}'
     else:
