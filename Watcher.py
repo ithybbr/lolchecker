@@ -8,7 +8,6 @@ class Watcher:
     def get_puuid(self, summoner_name, tag_line):
         url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag_line}?api_key={self.api_key}"
         response = requests.get(url)
-        print(f"get_puuid response: {response.status_code}, {response.text}")  # Debugging line
         if response.status_code == 200:
             data = response.json()
             return data['puuid']
@@ -43,7 +42,7 @@ if(__name__ == '__main__'):
     print(os.getenv("API_KEY"))
     p = w.get_puuid(test_names[0].split("#")[0], test_names[0].split("#")[1])
     print(p)
-    print(w.get_stats('europe', p))
-    print(w.get_spectator('europe', p))
-    print(w.get_clash('europe'))
+    print(w.get_stats('ru', p))
+    print(w.get_spectator('ru', p))
+    print(w.get_clash('ru'))
 
