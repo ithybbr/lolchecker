@@ -87,8 +87,9 @@ def get_stats(name:str) -> str:
             rank = x['rank']
             wins = x['wins']
             losses = x['losses']
+            lp = x['leaguePoints']
             winrate = round(wins/(wins+losses) * 100,2)
-            return f'{name} is in {tier} {rank} with {winrate}% winrate'
+            return f'{name} is in {tier} {rank} {lp}lp with {winrate}% winrate in {wins + losses} games'
 
 #CLASH LOGIC
 clash_types = {33: 'Summoner\'s Rift', 34: 'Howling Abyss'}
