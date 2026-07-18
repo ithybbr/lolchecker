@@ -52,8 +52,11 @@ async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = update.message.text
     text = text.replace('/chat','').strip()
-    response: str = gemini.ask_gemini(text)
-    await update.message.reply_text(response)
+    try:
+        response: str = await gemini.ask_gemini(text)
+        await update.message.reply_text(response)
+    except Exception as e:
+            await update.message.reply_text(str(e))
 #creates poll for the group chat
 async def poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = update.message.text.replace("/poll", "").strip()
@@ -133,7 +136,11 @@ async def clash(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(f'Update {update} caused error {context.error}')
-    await update.message.reply_text(context.error)
+    if isinstance(update, Update) and update.effective_message:
+        try:
+            await update.effective_message.reply_text("Something went wrong")
+        except Exception:
+            print("Failed to send error notification to chat")
 
 if __name__ == '__main__':
     print('Starting bot...')

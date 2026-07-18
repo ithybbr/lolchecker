@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
 
-def ask_gemini(prompt: str) -> str:
-    interaction = client.interactions.create(
+async def ask_gemini(prompt: str) -> str:
+    interaction = await client.aio.interactions.create(
         model="gemini-3.5-flash",
         input=prompt,
         system_instruction = '''
