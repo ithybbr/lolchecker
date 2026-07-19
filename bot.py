@@ -130,7 +130,7 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(response)
 async def matches(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name:str = update.message.text
-    name = name.replace('/stats','').strip()
+    name = name.replace('/matches','').strip()
     if(name == ''):
         await update.message.reply_text("Give the name")
         return
