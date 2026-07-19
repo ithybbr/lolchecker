@@ -110,7 +110,7 @@ def get_matches(name:str) ->str:
             if id != participant['puuid']:
                 continue
             else:
-                output += f'{count}. role - {participant['teamPosition']}. champion - {participant['championName']}. KDA - {participant['kills']}/{participant['deaths']}/{participant['assists']}. Result - {'won' if participant['win'] else 'lost'}\n'
+                output += f'{participant['teamPosition']}. {participant['championName']}. {participant['kills']}/{participant['deaths']}/{participant['assists']}. {'won' if participant['win'] else 'lost'}\n'
         count -= 1
     return output
 
