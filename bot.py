@@ -164,6 +164,7 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler('stats',stats))
     app.add_handler(CommandHandler('chat',chat))
     app.add_handler(CommandHandler('rate', get_exchange_rate))
+    app.add_handler(CommandHandler('matches', matches))
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
     app.add_handler(MessageHandler(filters.StatusUpdate.PINNED_MESSAGE, delete_pin_notification))
     app.add_handler(PollAnswerHandler(receive_poll_answer))
