@@ -36,7 +36,7 @@ def q_all() -> str:
         main_text = 'nobody is playing rn'
     return main_text
 
-matches_cache = Cache()
+live_matches_cache = Cache()
 def query(text: str) -> str:
     try:
         try:
@@ -44,9 +44,10 @@ def query(text: str) -> str:
         except Exception as e:
             print(f'Error occurred while getting ID for {text}: {e}')
             return f'didnt find id for {text}'
-        match = matches_cache.get(id)
+        match = live_matches_cache.get(id)
         if match == None:
             match = watcher.get_spectator(my_region, id)
+            live_matches_cache.set(id, match)
     except:
         pass
     if match != None:
@@ -59,7 +60,7 @@ def query(text: str) -> str:
             if(match['participants'][i]['puuid'] == id):
                 championId = match['participants'][i]['championId']
             if(match['participants'][i]['puuid'] in id_cache.values()):
-                matches_cache.set(match['participants'][i]['puuid'], match)
+                live_matches_cache.set(match['participants'][i]['puuid'], match)
         champName = leaguenames(championId)
         return f'{text} is playing {champName}. The game has started at {today} & current in-game time is roughly {minutes}:{seconds :02d}'
     else:
@@ -90,6 +91,28 @@ def get_stats(name:str) -> str:
             lp = x['leaguePoints']
             winrate = round(wins/(wins+losses) * 100,2)
             return f'{name} is in {tier} {rank} {lp}lp with {winrate}% winrate in {wins + losses} games'
+matches_cache = Cache()        
+def get_matches(name:str) ->str:
+    try:
+        id = getId(name)
+    except:
+        return f'twin, this guy {name} is chopped'
+    count = 5
+    matches_id = watcher.get_matches_ids(id, count = count)
+    output = f'last 5 games of {name}:\n'
+    for match_id in matches_id:
+        match = matches_cache.get(match_id)
+        if match == None:
+            match = watcher.get_match(match_id)
+            matches_cache.set(match_id, match)
+        participants = match['info']['participants']
+        for participant in participants:
+            if id != participant['puuid']:
+                continue
+            else:
+                output += f'{count}. role - {participant['teamPosition']}. champion - {participant['championName']}. KDA - {participant['kills']}/{participant['deaths']}/{participant['assists']}. Result - {'won' if participant['win'] else 'lost'}\n'
+        count -= 1
+    return output
 
 #CLASH LOGIC
 clash_types = {33: 'Summoner\'s Rift', 34: 'Howling Abyss'}
@@ -108,3 +131,7 @@ def next_clash() -> str:
             return f'Next clash is {theme} on {deadline}'
     else:
         return 'There is no clash scheduled at the moment'
+if(__name__ == '__main__'):
+    load_dotenv()
+    test_names = os.getenv("NAMES").split(",")
+    print(get_matches(test_names[0]))

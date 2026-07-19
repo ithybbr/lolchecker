@@ -34,6 +34,21 @@ class Watcher:
             return response.json()
         else:
             return None
+    def get_matches_ids(self, puuid, count = 5):
+        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count={count}&api_key={self.api_key}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
+    def get_match(self, match_id):
+        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={self.api_key}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
+
 if(__name__ == '__main__'):
     load_dotenv()
     test_names = os.getenv("NAMES").split(",")
@@ -45,4 +60,6 @@ if(__name__ == '__main__'):
     print(w.get_stats('ru', p))
     print(w.get_spectator('ru', p))
     print(w.get_clash('ru'))
+    match = w.get_matches_ids(p)[0]
+    print(w.get_match(match))
 

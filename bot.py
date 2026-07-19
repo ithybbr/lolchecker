@@ -128,7 +128,15 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = conv_names.get(name,name)
     response: str = lolchecker.get_stats(name)
     await update.message.reply_text(response)
-
+async def matches(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    name:str = update.message.text
+    name = name.replace('/stats','').strip()
+    if(name == ''):
+        await update.message.reply_text("Give the name")
+        return
+    name = conv_names.get(name,name)
+    response: str = lolchecker.get_matches(name)
+    await update.message.reply_text(response)
 #CLASH
 async def clash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response: str = lolchecker.next_clash()
