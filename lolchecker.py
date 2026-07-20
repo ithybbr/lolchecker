@@ -92,7 +92,7 @@ def get_stats(name:str) -> str:
             winrate = round(wins/(wins+losses) * 100,2)
             return f'{name} is in {tier} {rank} {lp}lp with {winrate}% winrate in {wins + losses} games'
 matches_cache = Cache()
-queue_types = {0: 'Custom Games', 400: 'Draft Pick', 420: 'Ranked Solo/Duo', 430: 'Blind Pick', 440: 'Ranked Flex', 450: 'ARAM', 700: 'Clash', 1700: 'Arena'}
+queue_types = {0: 'Custom Games', 400: 'Draft Pick', 420: 'Ranked Solo/Duo', 430: 'Blind Pick', 440: 'Ranked Flex', 450: 'ARAM', 700: 'Clash', 1750: 'Arena'}
 def get_matches(name:str) ->str:
     try:
         id = getId(name)
@@ -111,7 +111,9 @@ def get_matches(name:str) ->str:
             if id != participant['puuid']:
                 continue
             else:
-                queue = f'{queue_types[match['info']['queueId']]}.'
+                if match['info']['queueId'] not in queue_types:
+                    queue_types[match['info']['queueId']] = 'Unknown'
+                queue = f'{queue_types[match['info']['queueId']] }.'
                 pos = f"{participant['teamPosition'].capitalize()}." if participant['teamPosition'] != '' else '' # SAVE THE DOT
                 champion = f'{participant['championName']}.'
                 kda = f'{participant['kills']}/{participant['deaths']}/{participant['assists']}.'
