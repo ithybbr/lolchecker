@@ -105,7 +105,7 @@ def get_matches(name:str) ->str:
         match = matches_cache.get(match_id)
         if match == None:
             match = watcher.get_match(match_id)
-            matches_cache.set(match_id, match)
+            matches_cache.set(match_id, match, ttl= 60 * 60 * 24)
         participants = match['info']['participants']
         for participant in participants:
             if id != participant['puuid']:
