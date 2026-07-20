@@ -91,7 +91,8 @@ def get_stats(name:str) -> str:
             lp = x['leaguePoints']
             winrate = round(wins/(wins+losses) * 100,2)
             return f'{name} is in {tier} {rank} {lp}lp with {winrate}% winrate in {wins + losses} games'
-matches_cache = Cache()        
+matches_cache = Cache()
+queue_types = {0: 'Custom Games', 400: 'Draft Pick', 420: 'Ranked Solo/Duo', 430: 'Blind Pick', 440: 'Ranked Flex', 450: 'ARAM', 700: 'Clash', 1700: 'Arena'}
 def get_matches(name:str) ->str:
     try:
         id = getId(name)
@@ -110,8 +111,12 @@ def get_matches(name:str) ->str:
             if id != participant['puuid']:
                 continue
             else:
-                output += f'{participant['teamPosition']}. {participant['championName']}. {participant['kills']}/{participant['deaths']}/{participant['assists']}. {'won' if participant['win'] else 'lost'}\n'
-        count -= 1
+                queue = f'{queue_types[match['info']['queueId']]}.'
+                pos = f"{participant['teamPosition'].capitalize()}." if participant['teamPosition'] != '' else '' # SAVE THE DOT
+                champion = f'{participant['championName']}.'
+                kda = f'{participant['kills']}/{participant['deaths']}/{participant['assists']}.'
+                result = 'won' if participant['win'] else 'lost'
+                output += f'{queue} {pos} {champion} {kda} {result}\n'
     return output
 
 #CLASH LOGIC

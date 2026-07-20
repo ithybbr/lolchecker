@@ -25,6 +25,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     '/poll <text> - to create a poll for the group chat\n'
     '/stop - stops the replied poll'
     '/stats <name> - to check the stats of a player\n'
+    '/matches <name> - to get last 5 games of a player\n'
     '/chat <text> - to prompt gemini\n'
     '/rate <cur1> <cur2>- to get currency exchange rate'
     f'{json.dumps(conv_names, indent=4, separators=("", " --- "))}\n')
@@ -162,9 +163,9 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler('poll',poll))
     app.add_handler(CommandHandler('stop',stop))
     app.add_handler(CommandHandler('stats',stats))
+    app.add_handler(CommandHandler('matches', matches))
     app.add_handler(CommandHandler('chat',chat))
     app.add_handler(CommandHandler('rate', get_exchange_rate))
-    app.add_handler(CommandHandler('matches', matches))
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
     app.add_handler(MessageHandler(filters.StatusUpdate.PINNED_MESSAGE, delete_pin_notification))
     app.add_handler(PollAnswerHandler(receive_poll_answer))
