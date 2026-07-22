@@ -1,6 +1,7 @@
 from google import genai
 import os
 from dotenv import load_dotenv
+import asyncio
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
@@ -9,6 +10,7 @@ async def ask_gemini(prompt: str) -> str:
     interaction = await client.aio.interactions.create(
         model="gemini-3.5-flash",
         input=prompt,
+        timeout= 120000,
         system_instruction = '''
             ## Personality
             - Warm, approachable, and easygoing — like a friend who's part of the group, not a service answering requests.
@@ -29,7 +31,10 @@ async def ask_gemini(prompt: str) -> str:
     )
     return interaction.output_text
 
-if(__name__ == "__main__"):
-    prompt = "Write a poem about a lonely robot who wants to be human."
-    response = ask_gemini(prompt)
-    print(response)
+if __name__ == "__main__":
+    async def main():
+        prompt = "Write a poem about a lonely robot who wants to be human."
+        response = await ask_gemini(prompt)
+        print(response)
+
+    asyncio.run(main())

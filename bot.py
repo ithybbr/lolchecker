@@ -57,7 +57,10 @@ async def chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response: str = await gemini.ask_gemini(text)
         await update.message.reply_text(response)
     except Exception as e:
-            await update.message.reply_text(str(e))
+            message = str(e)
+            if hasattr(e, "body") and isinstance(e.body, dict):
+                message = e.body.get("error", {}).get("message", str(e))
+            await update.message.reply_text(message)
 #creates poll for the group chat
 async def poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = update.message.text.replace("/poll", "").strip()
